@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>EduJump ПОПРЫГУНЧИК — MATH EDITION 📐</title>
+    
+    <!-- МГНОВЕННОЕ БЛОКИРОВАНИЕ РЕДАКТОРА В РЕЖИМЕ ПЛЕЕРА ДЛЯ GENIALLY -->
+    <script>
+        if (window.location.search.includes('data=')) {
+            document.documentElement.classList.add('embed-mode');
+        }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Nunito:wght@800&family=Open+Sans:wght@800&family=Roboto+Mono:wght@700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -13,6 +21,12 @@
         :root { --bg: #020617; --pn: #0f172a; --bd: #1e293b; --acc: #38bdf8; --math-acc: #f59e0b; --txt: #f8fafc; --ok: #10b981; }
         body { margin: 0; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--txt); height: 100vh; display: flex; overflow: hidden; }
         
+        /* --- ЖЕСТКОЕ ПРАВИЛО ДЛЯ GENIALLY (СКРЫВАЕТ РЕДАКТОР) --- */
+        html.embed-mode #editor { display: none !important; }
+        html.embed-mode #game-area { width: 100vw !important; height: 100vh !important; flex: none !important; max-width: 100% !important; max-height: 100% !important; }
+        html.embed-mode body { justify-content: center; align-items: center; }
+        /* -------------------------------------------------------- */
+
         #editor { width: 440px; background: var(--pn); border-right: 2px solid var(--bd); display: flex; flex-direction: column; padding: 15px; z-index: 100; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
         .scroll { flex: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 10px; }
         h2 { font-family: 'Chakra Petch'; color: var(--math-acc); font-size: 0.8rem; margin: 15px 0 8px; text-transform: uppercase; border-bottom: 1px solid var(--bd); padding-bottom: 4px; letter-spacing: 1px; }
@@ -38,7 +52,6 @@
         #stage { position: relative; width: 800px; height: 450px; border-radius: 20px; overflow: hidden; background: #020617; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
         canvas { position: absolute; top: 0; left: 0; z-index: 1; touch-action: none; cursor: pointer; width: 800px; height: 450px; }
         
-        /* HTML-слои для формул */
         #q-overlay { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 500px; min-height: 60px; z-index: 50; display: none; align-items: center; justify-content: center; border: 3px solid #fff; border-radius: 10px; text-align: center; padding: 10px; box-sizing: border-box; font-weight: bold; font-size: 22px; pointer-events: none; }
         #plat-container { position: absolute; inset: 0; pointer-events: none; z-index: 25; overflow: hidden; }
         
@@ -50,13 +63,11 @@
         #win-rabbit-gif { height: auto; margin-bottom: 20px; display: none; max-height: 180px; width: auto; object-fit: contain; }
         #win-title { width: 100%; word-wrap: break-word; font-size: 2.2rem; margin: 10px 0; }
         
-        /* Стили встроенной шпаргалки */
         .cheat-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 5px; color: #cbd5e1; }
         .cheat-table th, .cheat-table td { border: 1px solid var(--bd); padding: 4px; text-align: left; }
         .cheat-table th { background: rgba(255,255,255,0.05); color: var(--math-acc); }
         .cheat-code { font-family: monospace; color: #f43f5e; background: rgba(0,0,0,0.4); padding: 1px 3px; border-radius: 3px; font-size: 11px; font-weight: bold; }
 
-        /* СТИЛИ ДЛЯ ЛОГОТИПА И КОПИРАЙТА */
         #creator-credit { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 25px 0 15px; text-align: center; }
         #creator-credit img { max-width: 140px; height: auto; margin-bottom: 8px; display: block; }
         #creator-credit .credit-text { font-size: 9px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; }
@@ -206,30 +217,22 @@
 </div>
 
 <script>
-// ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДВИЖКА
 const params = new URLSearchParams(window.location.search);
 const dataParam = params.get("data");
 
 if (dataParam) {
-
     try {
-
-JSON.parse(
-    decodeURIComponent(
-        escape(
-            atob(
-                decodeURIComponent(dataParam)
+        window.AUTO_IMPORT_CONFIG = JSON.parse(
+            decodeURIComponent(
+                escape(
+                    atob(
+                        decodeURIComponent(dataParam)
+                    )
+                )
             )
-        )
-    )
-)
-
-        window.AUTO_IMPORT_CONFIG = importedData;
-
+        );
     } catch(e) {
-
         console.error("CONFIG LOAD ERROR", e);
-
     }
 }
 
@@ -265,18 +268,25 @@ function liveStyle() {
     
     rabbitImg.style.width = cfg.st.hSize + 'px'; 
     winRabbitImg.style.width = 'auto'; winRabbitImg.style.maxWidth = '250px'; 
+    
     stage.style.background = cfg.st.isTrans ? 'transparent' : '#020617';
+    if (cfg.st.isTrans) {
+        document.body.style.background = 'transparent';
+        document.getElementById('game-area').style.background = 'transparent';
+    } else {
+        document.body.style.background = 'var(--bg)';
+        document.getElementById('game-area').style.background = '#000';
+    }
+    
     winUI.style.background = hexToRgba(cfg.st.winBg, 0.7); winUI.style.border = `2px solid ${cfg.st.winBd}`;
     
     const rBtn = document.getElementById('retry-btn-ui'); rBtn.style.background = cfg.st.btnBg; rBtn.style.color = cfg.st.btnTxt; rBtn.innerText = document.getElementById('lbl-retry').value;
     const wTitle = document.getElementById('win-title'); wTitle.style.fontFamily = cfg.st.font; wTitle.style.color = cfg.st.winTxt; wTitle.innerText = document.getElementById('lbl-win').value;
     
-    // Обновляем динамические стили текста платформ
     document.querySelectorAll('.plat-txt').forEach(el => { el.style.fontFamily = cfg.st.font; el.style.color = cfg.st.ansTxt; });
     if(game.active && game.player.vy === 0) { const hReal = rabbitImg.offsetHeight || cfg.st.hSize; game.player.y = game.player.lastPlatY - (cfg.st.pH/2) - (hReal/2) - game.feetOffset; }
 }
 
-// Запуск рендеринга формул KaTeX
 function renderMath(element) {
     if (window.renderMathInElement) {
         renderMathInElement(element, {
@@ -301,7 +311,6 @@ function initGame() {
     let wl = [...cfg.lv]; if (document.getElementById('shuffle-check').checked) { for (let i = wl.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [wl[i],wl[j]]=[wl[j],wl[i]]; } }
     game.currentQ = wl[0]?.q || ""; updateQ(game.currentQ);
     
-    // Генерируем структуру уровней
     game.platforms = [{ x: 400, y: 400, w: cfg.st.pW * 1.4, h: cfg.st.pH, isOk: true, txt: document.getElementById('lbl-start').value, q: wl[0]?.q || "" }];
     setTimeout(() => { const hReal = rabbitImg.offsetHeight || cfg.st.hSize; game.player = { x: 400, y: 400 - (cfg.st.pH/2) - (hReal/2) - game.feetOffset, vy: 0, targetX: 400, lastPlatY: 400 }; }, 50);
     
@@ -314,7 +323,6 @@ function initGame() {
     });
     game.totalClimb = 400 - cy;
 
-    // Отрисовываем HTML-блоки формул поверх платформ
     platContainer.innerHTML = '';
     game.platforms.forEach((pl, idx) => {
         const div = document.createElement('div');
@@ -359,7 +367,6 @@ function draw() {
         if(cfg.pImg) ctx.drawImage(cfg.pImg, pl.x-pl.w/2, pl.y-pl.h/2, pl.w, pl.h); 
         else { ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(pl.x-pl.w/2, pl.y-pl.h/2, pl.w, pl.h); }
         
-        // Синхронизация HTML-формулы с позицией платформы на холсте
         const txtEl = document.getElementById('plat-txt-' + idx);
         if(txtEl) {
             txtEl.style.left = pl.x + 'px';
@@ -377,10 +384,8 @@ function triggerWin() { game.won = true; if(cfg.audios.win) { cfg.audios.win.cur
 
 stage.addEventListener('pointerdown', (e) => { if(!game.active || game.player.vy !== 0 || game.won) return; const r = stage.getBoundingClientRect(), s = r.width/800; const mx = (e.clientX-r.left)/s, my = (e.clientY-r.top)/s - game.camY; game.platforms.forEach(pl => { if (mx > pl.x-pl.w/2 && mx < pl.x+pl.w/2 && my > pl.y-pl.h/2 && my < pl.y+pl.h/2 && pl.y < game.player.y) { game.player.targetX = pl.x; game.player.vy = -20; } }); });
 
-// ГЕНЕРАЦИЯ ЭКСПОРТНОГО КОДА ДЛЯ GENIALLY С ПОДДЕРЖКОЙ ФОРМУЛ
 let finalExport = "";
 function generateGeniallyCode() {
-
     liveStyle();
 
     const gameData = {
@@ -388,19 +393,16 @@ function generateGeniallyCode() {
         hw: document.getElementById('inp-h-win').value,
         b: document.getElementById('inp-b').value,
         p: document.getElementById('inp-p').value,
-
         s_s: document.getElementById('s-start').value,
         s_o: document.getElementById('s-ok').value,
         s_e: document.getElementById('s-err').value,
         s_w: document.getElementById('s-win').value,
-
         l: {
             s: document.getElementById('lbl-start').value,
             f_q: FINISH_MARKER,
             w_t: document.getElementById('lbl-win').value,
             r: document.getElementById('lbl-retry').value
         },
-
         lv: cfg.lv,
         st: cfg.st,
         para: game.parallaxSpeed,
@@ -408,26 +410,15 @@ function generateGeniallyCode() {
         shuf: document.getElementById('shuffle-check').checked
     };
 
-const encoded = encodeURIComponent(
-    btoa(
-        unescape(
-            encodeURIComponent(
-                JSON.stringify(gameData)
-            )
-        )
-    )
-);
-    finalExport =
-        '<iframe ' +
-        'src="https://vera422.github.io/edujump-engine/?data=' + encoded + '" ' +
-        'width="100%" ' +
-        'height="100%" ' +
-        'style="border:none;" ' +
-        'allowfullscreen>' +
-        '</iframe>';
+    const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(gameData)))));
+    
+    // Получаем текущий адрес страницы в браузере
+    let currentUrl = window.location.href.split('?')[0];
+    
+    // Генерируем iframe
+    finalExport = '<iframe src="' + currentUrl + '?data=' + encoded + '" width="100%" height="100%" style="border:none;" allowfullscreen></iframe>';
 
     document.getElementById('copy-btn').style.display = 'block';
-
     showTemporaryMessage('gen-msg');
 }
 
@@ -438,49 +429,35 @@ function copyToClipboard() {
     document.body.removeChild(textArea);
 }
 
-// Запуск первичных обработчиков
 if (window.AUTO_IMPORT_CONFIG) {
-
     const d = window.AUTO_IMPORT_CONFIG;
-
     document.getElementById('inp-h').value = d.h || "";
     document.getElementById('inp-h-win').value = d.hw || "";
     document.getElementById('inp-b').value = d.b || "";
     document.getElementById('inp-p').value = d.p || "";
-
     document.getElementById('s-start').value = d.s_s || "";
     document.getElementById('s-ok').value = d.s_o || "";
     document.getElementById('s-err').value = d.s_e || "";
     document.getElementById('s-win').value = d.s_w || "";
-
     document.getElementById('lbl-start').value = d.l.s || "";
     document.getElementById('lbl-win').value = d.l.w_t || "";
     document.getElementById('lbl-retry').value = d.l.r || "";
-
-    document.getElementById('bulk').value =
-        d.lv.map(v =>
-            `${v.q} | ${v.a} | ${v.w}`
-        ).join('\n');
-
+    document.getElementById('bulk').value = d.lv.map(v => `${v.q} | ${v.a} | ${v.w}`).join('\n');
     cfg.lv = d.lv || [];
-
     cfg.st = d.st || {};
+    document.getElementById('shuffle-check').checked = d.shuf;
 
-    document.getElementById('shuffle-check').checked =
-        d.shuf;
+    if(d.st.font) document.getElementById('st-font').value = d.st.font;
+    if(d.st.fx) document.getElementById('st-fx').value = d.st.fx;
 
     loadImg('b', d.b);
     loadImg('p', d.p);
-
     updateRabbit(d.h);
     updateWinRabbit(d.hw);
 
     setTimeout(() => {
-
         liveStyle();
-
         initGame();
-
     }, 1000);
 }
 
