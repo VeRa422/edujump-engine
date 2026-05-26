@@ -512,6 +512,11 @@ if (window.AUTO_IMPORT_CONFIG) {
     updateRabbit(d.h);
     updateWinRabbit(d.hw);
 
+    loadAudio('start', d.s_s);
+    loadAudio('ok', d.s_o);
+    loadAudio('err', d.s_e);
+    loadAudio('win', d.s_w);
+
     setTimeout(() => {
         liveStyle();
         initGame();
