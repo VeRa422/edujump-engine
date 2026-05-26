@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>EduJump ПОПРЫГУНЧИК — MATH EDITION 📐</title>
     
-    <!-- МГНОВЕННОЕ БЛОКИРОВАНИЕ РЕДАКТОРА В РЕЖИМЕ ПЛЕЕРА ДЛЯ GENIALLY -->
     <script>
         if (window.location.search.includes('data=')) {
             document.documentElement.classList.add('embed-mode');
@@ -55,7 +54,8 @@
         #q-overlay { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 500px; min-height: 60px; z-index: 50; display: none; align-items: center; justify-content: center; border: 3px solid #fff; border-radius: 10px; text-align: center; padding: 10px; box-sizing: border-box; font-weight: bold; font-size: 22px; pointer-events: none; }
         #plat-container { position: absolute; inset: 0; pointer-events: none; z-index: 25; overflow: hidden; }
         
-        .plat-txt { position: absolute; transform: translate(-50%, -50%); text-align: center; z-index: 30; font-size: 18px; font-weight: bold; pointer-events: none; display: flex; align-items: center; justify-content: center; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; }
+        /* ИСПРАВЛЕННЫЙ ШРИФТ ДЛЯ ПЛАТФОРМ (ЧЕТКАЯ ОБВОДКА И МЯГКАЯ ТЕНЬ БЕЗ РАЗДВОЕНИЯ) */
+        .plat-txt { position: absolute; transform: translate(-50%, -50%); text-align: center; z-index: 30; font-size: 20px; font-weight: 900; pointer-events: none; display: flex; align-items: center; justify-content: center; -webkit-text-stroke: 1px rgba(0,0,0,0.8); text-shadow: 0px 4px 6px rgba(0,0,0,0.7); }
         
         #rabbit-gif { position: absolute; z-index: 10; pointer-events: none; transform-origin: center bottom; display: none; height: auto; }
         #vol-ui { position: absolute; top: 15px; right: 15px; z-index: 110; background: rgba(15, 23, 42, 0.6); padding: 8px 12px; border-radius: 20px; backdrop-filter: blur(5px); display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.1); color:#fff; }
@@ -382,7 +382,6 @@ function draw() {
 
 function triggerWin() { game.won = true; if(cfg.audios.win) { cfg.audios.win.currentTime=0; cfg.audios.win.play().catch(()=>{}); } const fx = cfg.st.fx; for(let i=0; i<80; i++) game.particles.push({ x: game.player.x, y: game.player.y, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, c: fx==='fireworks'||fx==='confetti' ? `hsl(${Math.random()*360},70%,60%)` : cfg.st.glow, s: Math.random()*6+2, life: 1 }); winUI.style.display = 'flex'; }
 
-// УМНЫЕ КЛИКИ: БЕЗОШИБОЧНО РАБОТАЮТ ДАЖЕ ЕСЛИ ИГРА СИЛЬНО РАСТЯНУТА НА ВЕСЬ ЭКРАН
 stage.addEventListener('pointerdown', (e) => { 
     if(!game.active || game.player.vy !== 0 || game.won) return; 
     const r = stage.getBoundingClientRect();
@@ -443,7 +442,6 @@ function copyToClipboard() {
     document.body.removeChild(textArea);
 }
 
-// ФУНКЦИЯ АВТОМАСШТАБИРОВАНИЯ ИГРЫ ПОД РАЗМЕРЫ ОКНА GENIALLY
 function resizeStage() {
     if(document.documentElement.classList.contains('embed-mode')) {
         const scale = Math.min(window.innerWidth / 800, window.innerHeight / 450);
@@ -483,7 +481,7 @@ if (window.AUTO_IMPORT_CONFIG) {
     setTimeout(() => {
         liveStyle();
         initGame();
-        resizeStage(); // Принудительно вызываем масштабирование при запуске
+        resizeStage();
     }, 1000);
 }
 
