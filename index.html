@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>EduJump ПОПРЫГУНЧИК — MATH EDITION 📐</title>
     
+    <!-- МГНОВЕННОЕ БЛОКИРОВАНИЕ РЕДАКТОРА В РЕЖИМЕ ПЛЕЕРА ДЛЯ GENIALLY -->
     <script>
         if (window.location.search.includes('data=')) {
             document.documentElement.classList.add('embed-mode');
@@ -343,7 +344,6 @@ function render() {
         if (p.vy !== 0 || p.y < (p.lastPlatY - 100)) { 
             p.vy += 0.8; p.y += p.vy; p.x += (p.targetX - p.x) * 0.12; 
         } else {
-            // АВТО-КОРРЕКЦИЯ ПОЗИЦИИ: не дает белке висеть в воздухе
             p.y = p.lastPlatY - (cfg.st.pH/2) - (hReal/2) - game.feetOffset;
             p.x += (p.targetX - p.x) * 0.12;
         }
@@ -458,8 +458,10 @@ function resizeStage() {
 }
 window.addEventListener('resize', resizeStage);
 
+// ПОЛНОЦЕННОЕ ВОССТАНОВЛЕНИЕ ВСЕХ ПАРАМЕТРОВ ПРИ ИМПОРТЕ
 if (window.AUTO_IMPORT_CONFIG) {
     const d = window.AUTO_IMPORT_CONFIG;
+    
     document.getElementById('inp-h').value = d.h || "";
     document.getElementById('inp-h-win').value = d.hw || "";
     document.getElementById('inp-b').value = d.b || "";
@@ -468,16 +470,42 @@ if (window.AUTO_IMPORT_CONFIG) {
     document.getElementById('s-ok').value = d.s_o || "";
     document.getElementById('s-err').value = d.s_e || "";
     document.getElementById('s-win').value = d.s_w || "";
-    document.getElementById('lbl-start').value = d.l.s || "";
-    document.getElementById('lbl-win').value = d.l.w_t || "";
-    document.getElementById('lbl-retry').value = d.l.r || "";
-    document.getElementById('bulk').value = d.lv.map(v => `${v.q} | ${v.a} | ${v.w}`).join('\n');
-    cfg.lv = d.lv || [];
-    cfg.st = d.st || {};
-    document.getElementById('shuffle-check').checked = d.shuf;
+    
+    if(d.l) {
+        document.getElementById('lbl-start').value = d.l.s || "";
+        document.getElementById('lbl-win').value = d.l.w_t || "";
+        document.getElementById('lbl-retry').value = d.l.r || "";
+    }
 
-    if(d.st.font) document.getElementById('st-font').value = d.st.font;
-    if(d.st.fx) document.getElementById('st-fx').value = d.st.fx;
+    if(d.lv) document.getElementById('bulk').value = d.lv.map(v => `${v.q} | ${v.a} | ${v.w}`).join('\n');
+    cfg.lv = d.lv || [];
+    
+    document.getElementById('shuffle-check').checked = !!d.shuf;
+    if (d.off !== undefined) document.getElementById('inp-off').value = d.off;
+    if (d.para !== undefined) document.getElementById('inp-para').value = Math.round(d.para * 100);
+
+    if (d.st) {
+        if(d.st.font) document.getElementById('st-font').value = d.st.font;
+        if(d.st.fx) document.getElementById('st-fx').value = d.st.fx;
+        
+        if(d.st.qBg) document.getElementById('clr-q-bg').value = d.st.qBg;
+        if(d.st.qBd) document.getElementById('clr-q-bd').value = d.st.qBd;
+        if(d.st.qTxt) document.getElementById('clr-q-txt').value = d.st.qTxt;
+        if(d.st.glow) document.getElementById('clr-glow').value = d.st.glow;
+        if(d.st.winBg) document.getElementById('clr-win-bg').value = d.st.winBg;
+        if(d.st.winTxt) document.getElementById('clr-win-txt').value = d.st.winTxt;
+        if(d.st.btnBg) document.getElementById('clr-btn-bg').value = d.st.btnBg;
+        if(d.st.btnTxt) document.getElementById('clr-btn-txt').value = d.st.btnTxt;
+        if(d.st.ansTxt) document.getElementById('clr-ans-txt').value = d.st.ansTxt;
+        if(d.st.winBd) document.getElementById('clr-win-bd').value = d.st.winBd;
+        
+        if(d.st.useGlow !== undefined) document.getElementById('st-chk-glow').checked = d.st.useGlow;
+        if(d.st.isTrans !== undefined) document.getElementById('st-chk-trans').checked = d.st.isTrans;
+        
+        if(d.st.pW) document.getElementById('st-p-w').value = d.st.pW;
+        if(d.st.pH) document.getElementById('st-p-h').value = d.st.pH;
+        if(d.st.hSize) document.getElementById('st-h-size').value = d.st.hSize;
+    }
 
     loadImg('b', d.b);
     loadImg('p', d.p);
@@ -488,14 +516,14 @@ if (window.AUTO_IMPORT_CONFIG) {
         liveStyle();
         initGame();
         resizeStage();
-    }, 1000);
+    }, 300);
+} else {
+    liveStyle();
+    loadAudio('start', document.getElementById('s-start').value);
+    loadAudio('ok', document.getElementById('s-ok').value);
+    loadAudio('err', document.getElementById('s-err').value);
+    loadAudio('win', document.getElementById('s-win').value);
 }
-
-liveStyle();
-loadAudio('start', document.getElementById('s-start').value);
-loadAudio('ok', document.getElementById('s-ok').value);
-loadAudio('err', document.getElementById('s-err').value);
-loadAudio('win', document.getElementById('s-win').value);
 </script>
 </body>
 </html>
