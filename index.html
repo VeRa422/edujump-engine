@@ -54,7 +54,6 @@
         #q-overlay { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 500px; min-height: 60px; z-index: 50; display: none; align-items: center; justify-content: center; border: 3px solid #fff; border-radius: 10px; text-align: center; padding: 10px; box-sizing: border-box; font-weight: bold; font-size: 22px; pointer-events: none; }
         #plat-container { position: absolute; inset: 0; pointer-events: none; z-index: 25; overflow: hidden; }
         
-        /* ИСПРАВЛЕННЫЙ ШРИФТ ДЛЯ ПЛАТФОРМ (ЧЕТКАЯ ОБВОДКА И МЯГКАЯ ТЕНЬ БЕЗ РАЗДВОЕНИЯ) */
         .plat-txt { position: absolute; transform: translate(-50%, -50%); text-align: center; z-index: 30; font-size: 20px; font-weight: 900; pointer-events: none; display: flex; align-items: center; justify-content: center; -webkit-text-stroke: 1px rgba(0,0,0,0.8); text-shadow: 0px 4px 6px rgba(0,0,0,0.7); }
         
         #rabbit-gif { position: absolute; z-index: 10; pointer-events: none; transform-origin: center bottom; display: none; height: auto; }
@@ -341,7 +340,14 @@ function render() {
     if(!game.active) return;
     if(!game.won) {
         const p = game.player; const hReal = rabbitImg.offsetHeight || cfg.st.hSize;
-        if (p.vy !== 0 || p.y < (p.lastPlatY - 100)) { p.vy += 0.8; p.y += p.vy; p.x += (p.targetX - p.x) * 0.12; }
+        if (p.vy !== 0 || p.y < (p.lastPlatY - 100)) { 
+            p.vy += 0.8; p.y += p.vy; p.x += (p.targetX - p.x) * 0.12; 
+        } else {
+            // АВТО-КОРРЕКЦИЯ ПОЗИЦИИ: не дает белке висеть в воздухе
+            p.y = p.lastPlatY - (cfg.st.pH/2) - (hReal/2) - game.feetOffset;
+            p.x += (p.targetX - p.x) * 0.12;
+        }
+        
         game.platforms.forEach(plat => { 
             const b = p.y + hReal/2 + game.feetOffset; 
             if(p.vy > 0 && Math.abs(p.x - plat.x) < (plat.w/2 + 20) && b > plat.y - cfg.st.pH/2 && b < plat.y + cfg.st.pH/2 + p.vy) {
