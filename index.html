@@ -164,6 +164,8 @@
                 <div class="ui-item"><label>Высота (H)</label><input type="number" id="st-p-h" value="60" oninput="liveStyle()"></div>
                 <div class="ui-item"><label>Параллакс %</label><input type="range" id="inp-para" min="0" max="100" value="100" oninput="liveStyle()"></div>
                 <div class="ui-item"><label>Приземление</label><input type="range" id="inp-off" min="-150" max="150" value="0" oninput="liveStyle()"></div>
+                <div class="ui-item"><label>Размер текста ответов</label><input type="range" id="inp-ans-size" min="8" max="48" value="20" oninput="liveStyle()"></div>
+                <div class="ui-item"><label>Положение текста (↑↓)</label><input type="range" id="inp-ans-off" min="-60" max="60" value="7" oninput="liveStyle()"></div>
             </div>
             <label style="margin-top:10px; cursor:pointer; font-size:10px;"><input type="checkbox" id="shuffle-check" checked> <span>ПЕРЕМЕШИВАТЬ ВОПРОСЫ</span></label>
         </div>
@@ -262,7 +264,7 @@ function updateWinRabbit(url) { if(!url) return; winRabbitImg.src = url; winRabb
 function liveStyle() {
     game.feetOffset = parseInt(document.getElementById('inp-off').value);
     game.parallaxSpeed = parseInt(document.getElementById('inp-para').value) / 100;
-    cfg.st = { font: document.getElementById('st-font').value, fx: document.getElementById('st-fx').value, qBg: document.getElementById('clr-q-bg').value, qBd: document.getElementById('clr-q-bd').value, qTxt: document.getElementById('clr-q-txt').value, glow: document.getElementById('clr-glow').value, winBg: document.getElementById('clr-win-bg').value, winBd: document.getElementById('clr-win-bd').value, winTxt: document.getElementById('clr-win-txt').value, btnBg: document.getElementById('clr-btn-bg').value, btnTxt: document.getElementById('clr-btn-txt').value, ansTxt: document.getElementById('clr-ans-txt').value, useGlow: document.getElementById('st-chk-glow').checked, isTrans: document.getElementById('st-chk-trans').checked, pW: parseInt(document.getElementById('st-p-w').value) || 210, pH: parseInt(document.getElementById('st-p-h').value) || 60, hSize: parseInt(document.getElementById('st-h-size').value) || 60 };
+    cfg.st = { font: document.getElementById('st-font').value, fx: document.getElementById('st-fx').value, qBg: document.getElementById('clr-q-bg').value, qBd: document.getElementById('clr-q-bd').value, qTxt: document.getElementById('clr-q-txt').value, glow: document.getElementById('clr-glow').value, winBg: document.getElementById('clr-win-bg').value, winBd: document.getElementById('clr-win-bd').value, winTxt: document.getElementById('clr-win-txt').value, btnBg: document.getElementById('clr-btn-bg').value, btnTxt: document.getElementById('clr-btn-txt').value, ansTxt: document.getElementById('clr-ans-txt').value, useGlow: document.getElementById('st-chk-glow').checked, isTrans: document.getElementById('st-chk-trans').checked, pW: parseInt(document.getElementById('st-p-w').value) || 210, pH: parseInt(document.getElementById('st-p-h').value) || 60, hSize: parseInt(document.getElementById('st-h-size').value) || 60, ansSize: parseInt(document.getElementById('inp-ans-size').value) || 20, ansOff: parseInt(document.getElementById('inp-ans-off').value) || 7 };
     
     qOverlay.style.background = cfg.st.qBg; qOverlay.style.borderColor = cfg.st.qBd; qOverlay.style.color = cfg.st.qTxt; qOverlay.style.fontFamily = cfg.st.font;
     if(cfg.st.useGlow) qOverlay.style.boxShadow = `0 0 20px ${cfg.st.glow}`; else qOverlay.style.boxShadow = "none";
@@ -284,7 +286,7 @@ function liveStyle() {
     const rBtn = document.getElementById('retry-btn-ui'); rBtn.style.background = cfg.st.btnBg; rBtn.style.color = cfg.st.btnTxt; rBtn.innerText = document.getElementById('lbl-retry').value;
     const wTitle = document.getElementById('win-title'); wTitle.style.fontFamily = cfg.st.font; wTitle.style.color = cfg.st.winTxt; wTitle.innerText = document.getElementById('lbl-win').value;
     
-    document.querySelectorAll('.plat-txt').forEach(el => { el.style.fontFamily = cfg.st.font; el.style.color = cfg.st.ansTxt; });
+    document.querySelectorAll('.plat-txt').forEach(el => { el.style.fontFamily = cfg.st.font; el.style.color = cfg.st.ansTxt; el.style.fontSize = cfg.st.ansSize + 'px'; el.style.marginTop = cfg.st.ansOff + 'px'; });
     if(game.active && game.player.vy === 0) { const hReal = rabbitImg.offsetHeight || cfg.st.hSize; game.player.y = game.player.lastPlatY - (cfg.st.pH/2) - (hReal/2) - game.feetOffset; }
 }
 
@@ -505,6 +507,8 @@ if (window.AUTO_IMPORT_CONFIG) {
         if(d.st.pW) document.getElementById('st-p-w').value = d.st.pW;
         if(d.st.pH) document.getElementById('st-p-h').value = d.st.pH;
         if(d.st.hSize) document.getElementById('st-h-size').value = d.st.hSize;
+        if(d.st.ansSize !== undefined) document.getElementById('inp-ans-size').value = d.st.ansSize;
+        if(d.st.ansOff !== undefined) document.getElementById('inp-ans-off').value = d.st.ansOff;
     }
 
     loadImg('b', d.b);
