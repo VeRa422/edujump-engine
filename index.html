@@ -329,7 +329,7 @@ function initGame() {
     liveStyle();
     cfg.lv = document.getElementById('bulk').value.split('\n').filter(l => l.includes('|')).map(line => { const p = line.split('|').map(x => x.trim()); return { q: p[0], a: p[1], w: p[2] }; });
     game.active = true; game.camY = 0; game.won = false; game.particles = []; winUI.style.display = 'none'; qOverlay.style.display = 'flex';
-    rabbitImg.style.transform = 'rotate(0deg) scale(1)'; if(cfg.audios.start) cfg.audios.start.play().catch(()=>{});
+    rabbitImg.style.transform = 'rotate(0deg) scale(1)';
     
     let wl = [...cfg.lv]; if (document.getElementById('shuffle-check').checked) { for (let i = wl.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [wl[i],wl[j]]=[wl[j],wl[i]]; } }
     game.currentQ = wl[0]?.q || ""; updateQ(game.currentQ);
